@@ -1,6 +1,7 @@
 // RTC_DS3231.h
 #pragma once
 #include "I2CBase.h"
+#include "DateTime.h"
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
