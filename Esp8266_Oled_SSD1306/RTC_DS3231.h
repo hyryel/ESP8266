@@ -19,11 +19,11 @@ enum class Alarm
 
 enum class AlarmMode
 {
-	OncePerSecond,
-	WhenSecondsMatch,
-	WhenMinutesSecondsMatch,
-	WhenHoursMinutesSecondsMatch,
-	WhenDateHoursMinutesSecondsMatch
+	OncePerSecond = 0x0F,
+	WhenSecondsMatch = 0x0E,
+	WhenMinutesSecondsMatch = 0x0C,
+	WhenHoursMinutesSecondsMatch = 0x08,
+	WhenDateHoursMinutesSecondsMatch = 0x00
 };
 
 class RTC_DS3231 : public I2CBase
@@ -42,6 +42,7 @@ public:
 	void SetAlarmDate(Alarm al, bool byDay, uint16_t day);
 	void SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16_t second);
 	void SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t minutes, uint16_t second);
+	void EnableAlarm(Alarm al, AlarmMode mod);
 
 protected:
 	void CustomSetup() override;

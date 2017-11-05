@@ -133,7 +133,7 @@ void RTC_DS3231::SetAlarmDate(Alarm al, bool byDay, uint16_t day)
 		adr = FuncAlarm2Day;
 		break;
 	}
-	byte value = byDay ? 0x40 : 0x00; 
+	byte value = byDay ? 0x40 : 0x00;
 	value |= IntToBCD(byDay ? day % 7 : day % 31, TypeOfValue::SecOrMinOrMonthOrDate);
 
 	WriteToRegister(adr, value);
@@ -153,13 +153,13 @@ void RTC_DS3231::SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16
 	WriteToRegister(adr, val);
 	//set minutes
 	adr = al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes;
-	val = IntToBCD(minute%60, TypeOfValue::SecOrMinOrMonthOrDate);
+	val = IntToBCD(minute % 60, TypeOfValue::SecOrMinOrMonthOrDate);
 	WriteToRegister(adr, val);
 	if (al == Alarm::Alarm1)
 	{
 		//set second
 		adr = FuncAlarm1Seconds;
-		val = IntToBCD(second%60, TypeOfValue::SecOrMinOrMonthOrDate);
+		val = IntToBCD(second % 60, TypeOfValue::SecOrMinOrMonthOrDate);
 		WriteToRegister(adr, val);
 	}
 }
@@ -186,6 +186,27 @@ void RTC_DS3231::SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t min
 		val = IntToBCD(second % 60, TypeOfValue::SecOrMinOrMonthOrDate);
 		WriteToRegister(adr, val);
 	}
+}
+
+void RTC_DS3231::EnableAlarm(Alarm al, AlarmMode mod)
+{
+	byte val;
+	val = ReadFromRegister(FuncAlarm1Seconds);
+	val = ((byte)mod & (byte)AlarmMode::OncePerSecond) == (byte)AlarmMode::OncePerSecond ? val | 0x80 : val & 0x7F ;
+	WriteToRegister(FuncAlarm1Seconds, val); //deactivate seconds
+
+	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes);
+	val = ((byte)mod & (byte)AlarmMode::WhenSecondsMatch) == (byte)AlarmMode::WhenSecondsMatch ? val | 0x80 : val & 0x7F;
+	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes, val ); //activate minutes
+
+	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours);
+	val = ((byte)mod & (byte)AlarmMode::WhenMinutesSecondsMatch) == (byte)AlarmMode::WhenMinutesSecondsMatch? val | 0x80 : val & 0x7F;
+	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours, val | 0x80); //activate hours
+
+	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date);
+	val = ((byte)mod & (byte)AlarmMode::WhenHoursMinutesSecondsMatch) == (byte)AlarmMode::WhenHoursMinutesSecondsMatch? val | 0x80 : val & 0x7F;
+	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date, val ); //activate date
+
 }
 
 
