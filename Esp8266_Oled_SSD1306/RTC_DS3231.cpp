@@ -13,17 +13,12 @@ RTC_DS3231::RTC_DS3231(byte address, uint16_t clockRateKhz) : I2CBase(address, c
 TimeSpan RTC_DS3231::GetTime()
 {
 	TimeSpan result;
-	byte* buffer = (byte*)calloc(1, sizeof(byte));
-	ReadFromRegister(FuncSeconds, buffer, 1);
+	byte* buffer = (byte*)calloc(3, sizeof(byte));
+	ReadFromRegister(FuncSeconds, buffer, 3);
+
 	result.Seconds = BCDToInt(buffer[0], TypeOfValue::SecOrMinOrMonthOrDate);
-
-	buffer[0] = 0;
-	ReadFromRegister(FuncMinutes, buffer, 1);
-	result.Minutes = BCDToInt(buffer[0], TypeOfValue::SecOrMinOrMonthOrDate);
-
-	buffer[0] = 0;
-	ReadFromRegister(FuncHours, buffer, 1);
-	result.Hours = BCDToInt(buffer[0], TypeOfValue::Hours24);
+	result.Minutes = BCDToInt(buffer[1], TypeOfValue::SecOrMinOrMonthOrDate);
+	result.Hours = BCDToInt(buffer[2], TypeOfValue::Hours24);
 
 	free(buffer);
 	return result;
