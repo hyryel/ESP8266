@@ -19,6 +19,7 @@ class I2CBase
 		void WriteToRegister(byte reg, byte* values, size_t valLength);
 		void WriteToRegister(byte reg, byte value);
 		int ReadFromRegister(byte reg, byte* readBuffer, size_t buffLength);
+		byte ReadFromRegister(byte reg);
 		virtual void CustomSetup() {};
 	private:
 		byte _address;

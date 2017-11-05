@@ -60,6 +60,23 @@ int I2CBase::ReadFromRegister(byte reg, byte* readBuffer, size_t buffLength)
 	}
 	return 0;
 }
+byte I2CBase::ReadFromRegister(byte reg)
+{
+	if (_initialized)
+	{
+		SetClockRate();
+		//Advertise the slave device that we will need some data
+		Wire.beginTransmission(_address);
+		//Select the register to read from
+		Wire.write(reg);
+		//Send the instruction and Instruct the slave that we don't have finished with him
+		Wire.endTransmission(false);
+		//Ask the slave to read
+		Wire.requestFrom((int)_address, 1);
+		return Wire.read();
+	}
+	return 0;
+}
 //Set the clock rate in Khz before executing command
 void I2CBase::SetClockRate()
 {
