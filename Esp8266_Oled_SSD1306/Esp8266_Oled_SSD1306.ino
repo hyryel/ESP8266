@@ -19,7 +19,6 @@ ulong Interval = 1000;
 // the loop function runs over and over again until power down or reset
 void loop()
 {
-
 	if (millis() - elapsed > Interval)
 	{
 		TimeSpan time = clock.GetTime();
@@ -36,9 +35,9 @@ void loop()
 		free(sdateTime);
 
 		ClockStatus status = clock.ReadStatus();
-		Serial.print("Alarm 1 is " );
+		Serial.print("Alarm 1 is ");
 		Serial.println(status.Alarm1FlagOn ? "On" : "Off");
-		Serial.print("Alarm 2 is " );
+		Serial.print("Alarm 2 is ");
 		Serial.println(status.Alarm2FlagOn ? "On" : "Off");
 		Serial.print("32 Khz output is ");
 		Serial.println(status.Output32KhEnabled ? "On" : "Off");
@@ -48,7 +47,8 @@ void loop()
 		Serial.println(status.OscillatorHasStopped ? "Yes" : "No");
 		if (status.OscillatorHasStopped)
 		{
-			clock.ResetOscillatorStoppedFlag();
+			status.OscillatorHasStopped = false;
+			clock.SetStatus(status);
 		}
 		clock.Enable32KhzOutput(!status.Output32KhEnabled);
 

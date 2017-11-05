@@ -229,6 +229,16 @@ ClockStatus RTC_DS3231::ReadStatus()
 	return status;
 }
 
+//Set the status using a user friendly method
+void RTC_DS3231::SetStatus(ClockStatus newStatus)
+{
+	byte value = newStatus.OscillatorHasStopped << 7;
+	value |= (newStatus.Output32KhEnabled << 3);
+	value |= (newStatus.Alarm2FlagOn << 1);
+	value |= (newStatus.Alarm1FlagOn << 0);
+	WriteToRegister(FuncStatus, value);
+}
+
 //Set the OSF flaf to 0
 void RTC_DS3231::ResetOscillatorStoppedFlag()
 {
