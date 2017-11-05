@@ -206,7 +206,12 @@ void RTC_DS3231::EnableAlarm(Alarm al, AlarmMode mod)
 	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date);
 	val = ((byte)mod & (byte)AlarmMode::WhenHoursMinutesSecondsMatch) == (byte)AlarmMode::WhenHoursMinutesSecondsMatch? val | 0x80 : val & 0x7F;
 	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date, val ); //activate date
-
+}
+//Set alarm flag to off
+void RTC_DS3231::ResetAlarm(Alarm al)
+{
+	byte val = ReadFromRegister(FuncStatus);
+	WriteToRegister(FuncStatus, val & (al == Alarm::Alarm1 ? 0xFE : 0xFD ));
 }
 
 

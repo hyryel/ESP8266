@@ -43,7 +43,7 @@ public:
 	void SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16_t second);
 	void SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t minutes, uint16_t second);
 	void EnableAlarm(Alarm al, AlarmMode mod);
-
+	void ResetAlarm(Alarm al);
 protected:
 	void CustomSetup() override;
 
