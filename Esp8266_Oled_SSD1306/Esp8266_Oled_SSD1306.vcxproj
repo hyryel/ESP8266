@@ -82,6 +82,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DateTime.h" />
     <ClInclude Include="I2CBase.h" />
     <ClInclude Include="OLED_1306.h" />
     <ClInclude Include="RTC_DS3231.h" />

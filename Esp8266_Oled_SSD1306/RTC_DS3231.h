@@ -1,57 +1,13 @@
 // RTC_DS3231.h
+#pragma once
 #include "I2CBase.h"
-
-#ifndef _RTC_DS3231_h
-#define _RTC_DS3231_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
 #endif
-class TimeSpan
-{
-public:
-	uint16 Seconds;
-	uint16_t Minutes;
-	uint16_t Hours;
-	char* ToString();
-};
 
-class Date
-{
-public:
-	uint16_t Day;
-	uint16_t Month;
-	uint16_t Year;
-	char* ToString();
-};
-
-class DateTime
-{
-public :
-	TimeSpan Time;
-	Date Day;
-	char* ToString();
-};
-
-enum class TypeOfValue
-{
-	SecOrMinOrMonthOrDate,
-	Hours24,
-	Hours12,
-	Year
-};
-enum class DayOfWeek
-{
-	Monday = 1,
-	Tuesday,
-	Wednesday,
-	Thursday,
-	Friday,
-	Saturday,
-	Sunday
-};
 #define RTC_DEFAULT_ADDRESS 0x68
 class RTC_DS3231 : public I2CBase
 {
@@ -93,8 +49,4 @@ private:
 	const byte FuncMSBTemp = 0x11;
 	const byte FuncLSBTemp = 0x12;
 };
-
-
-
-#endif
 

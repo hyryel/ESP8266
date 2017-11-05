@@ -1,7 +1,3 @@
-// 
-// 
-// 
-
 #include "RTC_DS3231.h"
 //Create the RTC object with default address 0x68 and default clock rate (400 Khz)
 RTC_DS3231::RTC_DS3231() : RTC_DS3231(RTC_DEFAULT_ADDRESS)
@@ -212,27 +208,4 @@ uint16_t RTC_DS3231::IntToBCD(byte value, TypeOfValue tov)
 	return val;
 }
 
-char* TimeSpan::ToString()
-{
-	char* buffer = (char*)calloc(9, sizeof(char));
-	snprintf(buffer, 9, "%02d:%02d:%02d", Hours, Minutes, Seconds);
 
-	return buffer;
-}
-
-char * Date::ToString()
-{
-	char* buffer = (char*)calloc(11, sizeof(char));
-
-	snprintf(buffer, 11, "%02d/%02d/%02d", Year, Month, Day);
-	return buffer;
-}
-
-char * DateTime::ToString()
-{
-	char* s = (char*)calloc(18, sizeof(char));
-
-	snprintf(s, 20, "%02d/%02d/%02d %02d:%02d:%02d", Day.Year, Day.Month, Day.Day, Time.Hours, Time.Minutes, Time.Seconds);
-
-	return s;
-}
