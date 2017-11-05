@@ -1,7 +1,5 @@
 // I2CBase.h
-
-#ifndef _I2CBASE_h
-#define _I2CBASE_h
+#pragma once
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
@@ -30,5 +28,4 @@ class I2CBase
 		const int DefaultClockRate = 400;
 };
 
-#endif
 
