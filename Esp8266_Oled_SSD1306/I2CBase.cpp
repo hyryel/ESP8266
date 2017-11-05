@@ -18,6 +18,20 @@ void I2CBase::WriteToRegister(byte reg, byte * values, size_t valLength)
 	}
 }
 
+void I2CBase::WriteToRegister(byte reg, byte value)
+{
+	if (_initialized)
+	{
+		//advertise the slave device that we will send something
+		Wire.beginTransmission(_address);
+		//select the register to write to
+		Wire.write(reg);
+		//write data to the selected register
+		Wire.write(value);
+		Wire.endTransmission();
+	}
+}
+
 int I2CBase::ReadFromRegister(byte reg, byte* readBuffer, size_t buffLenght)
 {
 	if (_initialized)
