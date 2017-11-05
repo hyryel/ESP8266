@@ -54,6 +54,7 @@ public:
 	void EnableAlarm(Alarm al, AlarmMode mod);
 	void ResetAlarm(Alarm al);
 	ClockStatus ReadStatus();
+	void ResetOscillatorStoppedFlag();
 
 protected:
 	void CustomSetup() override;

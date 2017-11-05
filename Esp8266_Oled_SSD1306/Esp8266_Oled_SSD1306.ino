@@ -46,6 +46,10 @@ void loop()
 		Serial.println(status.IsBusy ? "Busy" : "Available");
 		Serial.print("Oscillator has stopped  : ");
 		Serial.println(status.OscillatorHasStopped ? "Yes" : "No");
+		if (status.OscillatorHasStopped)
+		{
+			clock.ResetOscillatorStoppedFlag();
+		}
 
 		elapsed = millis();
 	}

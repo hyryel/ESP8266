@@ -73,6 +73,7 @@ void RTC_DS3231::SetDate(uint16_t year, uint16_t month, uint16_t day)
 	WriteToRegister(FuncDay, buf);
 
 }
+
 //Set the time in 24h format
 void RTC_DS3231::SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds)
 {
@@ -89,6 +90,7 @@ void RTC_DS3231::SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds)
 	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
 	WriteToRegister(FuncSeconds, buf);
 }
+
 //Set the time in 12h format
 void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds)
 {
@@ -107,11 +109,13 @@ void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t
 	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
 	WriteToRegister(FuncSeconds, buf);
 }
+
 //Set the day of week.
 void RTC_DS3231::SetDay(DayOfWeek day)
 {
 	WriteToRegister(FuncDay, (byte)day);
 }
+
 //Set the day/date of the alarm
 //al : Alarm1 or Alarm2
 //byDay : if true, day should be a value of DayOfWeek
@@ -134,6 +138,7 @@ void RTC_DS3231::SetAlarmDate(Alarm al, bool byDay, uint16_t day)
 	WriteToRegister(adr, value);
 
 }
+
 //Set the time for the alarm in 24h format
 //al : Alarm1 or Alarm2
 //hour : hour in 24h format. the value is modulo 24
@@ -158,6 +163,7 @@ void RTC_DS3231::SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16
 		WriteToRegister(adr, val);
 	}
 }
+
 //Set the time for the alarm in 12h format
 //al : Alarm1 or Alarm2
 //hour : hour in 12h format. the value is modulo 12
@@ -202,12 +208,14 @@ void RTC_DS3231::EnableAlarm(Alarm al, AlarmMode mod)
 	val = ((byte)mod & (byte)AlarmMode::WhenHoursMinutesSecondsMatch) == (byte)AlarmMode::WhenHoursMinutesSecondsMatch ? val | 0x80 : val & 0x7F;
 	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date, val); //activate date
 }
+
 //Set alarm flag to off
 void RTC_DS3231::ResetAlarm(Alarm al)
 {
 	byte val = ReadFromRegister(FuncStatus);
 	WriteToRegister(FuncStatus, val & (al == Alarm::Alarm1 ? 0xFE : 0xFD));
 }
+
 //Return the status register of the clock
 ClockStatus RTC_DS3231::ReadStatus()
 {
@@ -219,6 +227,13 @@ ClockStatus RTC_DS3231::ReadStatus()
 	status.Output32KhEnabled = (val & 0x08) == 0x08;
 	status.OscillatorHasStopped = (val & 0x80) == 0x80;
 	return status;
+}
+
+//Set the OSF flaf to 0
+void RTC_DS3231::ResetOscillatorStoppedFlag()
+{
+	byte status = ReadFromRegister(FuncStatus);
+	WriteToRegister(FuncStatus, status & 0x7F);
 }
 
 
