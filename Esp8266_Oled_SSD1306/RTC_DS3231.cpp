@@ -187,26 +187,38 @@ void RTC_DS3231::EnableAlarm(Alarm al, AlarmMode mod)
 {
 	byte val;
 	val = ReadFromRegister(FuncAlarm1Seconds);
-	val = ((byte)mod & (byte)AlarmMode::OncePerSecond) == (byte)AlarmMode::OncePerSecond ? val | 0x80 : val & 0x7F ;
+	val = ((byte)mod & (byte)AlarmMode::OncePerSecond) == (byte)AlarmMode::OncePerSecond ? val | 0x80 : val & 0x7F;
 	WriteToRegister(FuncAlarm1Seconds, val); //deactivate seconds
 
 	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes);
 	val = ((byte)mod & (byte)AlarmMode::WhenSecondsMatch) == (byte)AlarmMode::WhenSecondsMatch ? val | 0x80 : val & 0x7F;
-	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes, val ); //activate minutes
+	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes, val); //activate minutes
 
 	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours);
-	val = ((byte)mod & (byte)AlarmMode::WhenMinutesSecondsMatch) == (byte)AlarmMode::WhenMinutesSecondsMatch? val | 0x80 : val & 0x7F;
+	val = ((byte)mod & (byte)AlarmMode::WhenMinutesSecondsMatch) == (byte)AlarmMode::WhenMinutesSecondsMatch ? val | 0x80 : val & 0x7F;
 	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours, val | 0x80); //activate hours
 
 	val = ReadFromRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date);
-	val = ((byte)mod & (byte)AlarmMode::WhenHoursMinutesSecondsMatch) == (byte)AlarmMode::WhenHoursMinutesSecondsMatch? val | 0x80 : val & 0x7F;
-	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date, val ); //activate date
+	val = ((byte)mod & (byte)AlarmMode::WhenHoursMinutesSecondsMatch) == (byte)AlarmMode::WhenHoursMinutesSecondsMatch ? val | 0x80 : val & 0x7F;
+	WriteToRegister(al == Alarm::Alarm1 ? FuncAlarm1Date : FuncAlarm2Date, val); //activate date
 }
 //Set alarm flag to off
 void RTC_DS3231::ResetAlarm(Alarm al)
 {
 	byte val = ReadFromRegister(FuncStatus);
-	WriteToRegister(FuncStatus, val & (al == Alarm::Alarm1 ? 0xFE : 0xFD ));
+	WriteToRegister(FuncStatus, val & (al == Alarm::Alarm1 ? 0xFE : 0xFD));
+}
+//Return the status register of the clock
+ClockStatus RTC_DS3231::ReadStatus()
+{
+	byte val = ReadFromRegister(FuncStatus);
+	ClockStatus status;
+	status.Alarm1FlagOn = (val & 0x01) == 0x01;
+	status.Alarm2FlagOn = (val & 0x02) == 0x02;
+	status.IsBusy = (val & 0x04) == 0x04;
+	status.Output32KhEnabled = (val & 0x08) == 0x08;
+	status.OscillatorHasStopped = (val & 0x80) == 0x80;
+	return status;
 }
 
 

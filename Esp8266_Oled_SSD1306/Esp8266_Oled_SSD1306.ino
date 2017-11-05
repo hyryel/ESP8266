@@ -34,6 +34,19 @@ void loop()
 		free(stime);
 		free(sday);
 		free(sdateTime);
+
+		ClockStatus status = clock.ReadStatus();
+		Serial.print("Alarm 1 is " );
+		Serial.println(status.Alarm1FlagOn ? "On" : "Off");
+		Serial.print("Alarm 2 is " );
+		Serial.println(status.Alarm2FlagOn ? "On" : "Off");
+		Serial.print("32 Khz output is ");
+		Serial.println(status.Output32KhEnabled ? "On" : "Off");
+		Serial.print("Clock is ");
+		Serial.println(status.IsBusy ? "Busy" : "Available");
+		Serial.print("Oscillator has stopped  : ");
+		Serial.println(status.OscillatorHasStopped ? "Yes" : "No");
+
 		elapsed = millis();
 	}
 }

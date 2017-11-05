@@ -26,6 +26,15 @@ enum class AlarmMode
 	WhenDateHoursMinutesSecondsMatch = 0x00
 };
 
+struct ClockStatus
+{
+	bool OscillatorHasStopped;
+	bool Output32KhEnabled;
+	bool IsBusy;
+	bool Alarm1FlagOn;
+	bool Alarm2FlagOn;
+};
+
 class RTC_DS3231 : public I2CBase
 {
 public:
@@ -44,6 +53,8 @@ public:
 	void SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t minutes, uint16_t second);
 	void EnableAlarm(Alarm al, AlarmMode mod);
 	void ResetAlarm(Alarm al);
+	ClockStatus ReadStatus();
+
 protected:
 	void CustomSetup() override;
 
