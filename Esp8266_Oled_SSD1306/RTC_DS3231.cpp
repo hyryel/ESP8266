@@ -236,6 +236,13 @@ void RTC_DS3231::ResetOscillatorStoppedFlag()
 	WriteToRegister(FuncStatus, status & 0x7F);
 }
 
+//Enable or disable the 32Khz output
+void RTC_DS3231::Enable32KhzOutput(bool enable)
+{
+	byte status = ReadFromRegister(FuncStatus);
+	WriteToRegister(FuncStatus, (enable ? status | 0x08 : status & ~0x08));
+}
+
 
 void RTC_DS3231::CustomSetup()
 {

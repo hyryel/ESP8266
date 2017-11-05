@@ -55,6 +55,7 @@ public:
 	void ResetAlarm(Alarm al);
 	ClockStatus ReadStatus();
 	void ResetOscillatorStoppedFlag();
+	void Enable32KhzOutput(bool enable);
 
 protected:
 	void CustomSetup() override;

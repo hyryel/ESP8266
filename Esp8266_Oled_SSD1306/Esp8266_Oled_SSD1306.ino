@@ -50,6 +50,7 @@ void loop()
 		{
 			clock.ResetOscillatorStoppedFlag();
 		}
+		clock.Enable32KhzOutput(!status.Output32KhEnabled);
 
 		elapsed = millis();
 	}
