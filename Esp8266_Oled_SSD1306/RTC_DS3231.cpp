@@ -100,8 +100,8 @@ void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t
 	byte buf;
 	buf = hours % 12;
 	buf = IntToBCD(buf, TypeOfValue::Hours12);
-	buf |= 0x40; //set 12h format
-	buf |= isPM ? 0x20 : 0x00;
+	buf += 0x40; //set 12h format
+	buf += isPM ? 0x20 : 0x00;
 	WriteToRegister(FuncHours, buf);
 
 	buf = minutes % 60;
@@ -134,7 +134,7 @@ void RTC_DS3231::SetAlarmDate(Alarm al, bool byDay, uint16_t day)
 		break;
 	}
 	byte value = byDay ? 0x40 : 0x00;
-	value |= IntToBCD(byDay ? day % 7 : day % 31, TypeOfValue::SecOrMinOrMonthOrDate);
+	value += IntToBCD(byDay ? day % 7 : day % 31, TypeOfValue::SecOrMinOrMonthOrDate);
 
 	WriteToRegister(adr, value);
 
@@ -238,7 +238,7 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		// bit 1 :   => seconds * 1
 		// bit 0 :  /
 		val = ((value & 0x70) >> 4) * 10;
-		val |= (value & 0x0F);
+		val += (value & 0x0F);
 		break;
 #pragma endregion
 #pragma region Hours
@@ -262,8 +262,8 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		{
 			val = (value & 0x20) == 0x20 ? 20 : 0;
 		}
-		val |= (value & 0x10) == 0x10 ? 10 : 0;
-		val |= (value & 0x0F);
+		val += (value & 0x10) == 0x10 ? 10 : 0;
+		val += (value & 0x0F);
 		break;
 #pragma endregion
 #pragma region Year
@@ -279,7 +279,7 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		// bit 1 :   => year * 1
 		// bit 0 :  /
 		val = ((value & 0xF0) >> 4) * 10;
-		val |= (value & 0x0F);
+		val += (value & 0x0F);
 		break;
 #pragma endregion
 	}
@@ -294,17 +294,17 @@ uint16_t RTC_DS3231::IntToBCD(byte value, TypeOfValue tov)
 	{
 	case TypeOfValue::SecOrMinOrMonthOrDate:
 		val = (value / 10) << 4;
-		val |= value % 10;
+		val += value % 10;
 		val &= 0x7F;
 		break;
 	case TypeOfValue::Hours24:
 		val = (value / 20 >= 1) ? 0x20 : (value / 10 >= 1 ? 0x10 : 0x00);
-		val |= (value % 10);
+		val += (value % 10);
 		break;
 	case TypeOfValue::Hours12:
 	case TypeOfValue::Year:
 		val = (value / 10) << 4;
-		val |= value % 10;
+		val += value % 10;
 		break;
 	}
 	return val;
