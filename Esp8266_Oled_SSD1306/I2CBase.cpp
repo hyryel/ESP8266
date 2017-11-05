@@ -83,7 +83,6 @@ void I2CBase::SetClockRate()
 	if (_initialized)
 	{
 		Wire.setClock(_clockRate*1000);
-		Wire.status();
 	}
 }
 
@@ -105,7 +104,7 @@ void I2CBase::Setup(uint8_t SDA, uint8_t SCL)
 	_sda = SDA;
 	Wire.begin(_sda, _scl);
 	//Initialize clock rate for I²C
-	Wire.setClock(_clockRate);
+	Wire.setClock(_clockRate*1000);
 	//Configure custom setup (this method is custom implemented)
 	CustomSetup();
 	//setup is done
