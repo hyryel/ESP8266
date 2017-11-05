@@ -47,11 +47,14 @@ class RTC_DS3231 : public I2CBase
 {
 public:
 	RTC_DS3231(); //Don't forget to call Setup() before using
+	RTC_DS3231(byte address);
+	RTC_DS3231(byte address, uint16_t clockRateKhz);
 	TimeSpan GetTime();
 	Date GetDate();
 	DateTime GetDateTime();
 	void SetDate(uint16_t year, uint16_t month, uint16_t day);
-	void SetTime(uint16_t hours, uint16_t minutes, uint16_t seconds);
+	void SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds);
+	void SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds);
 protected:
 
 private:

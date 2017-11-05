@@ -3,11 +3,17 @@
 // 
 
 #include "RTC_DS3231.h"
-
+//Create the rtc object with default address 0x68
 RTC_DS3231::RTC_DS3231() : I2CBase(RTC_DEFAULT_ADDRESS)
 {
 }
-
+RTC_DS3231::RTC_DS3231(byte address) : I2CBase(address)
+{
+}
+RTC_DS3231::RTC_DS3231(byte address, uint16_t clockRateKhz) : I2CBase(address, clockRateKhz)
+{
+}
+//Get the time
 TimeSpan RTC_DS3231::GetTime()
 {
 	TimeSpan result;
@@ -27,7 +33,7 @@ TimeSpan RTC_DS3231::GetTime()
 	return result;
 }
 
-
+//Get the date
 Date RTC_DS3231::GetDate()
 {
 	Date date;
@@ -48,6 +54,7 @@ Date RTC_DS3231::GetDate()
 	return date;
 }
 
+//Get the date and time
 DateTime RTC_DS3231::GetDateTime()
 {
 	DateTime date;
@@ -58,6 +65,7 @@ DateTime RTC_DS3231::GetDateTime()
 	return date;
 }
 
+//Set the date
 void RTC_DS3231::SetDate(uint16_t year, uint16_t month, uint16_t day)
 {
 	byte buf[1];
@@ -74,8 +82,8 @@ void RTC_DS3231::SetDate(uint16_t year, uint16_t month, uint16_t day)
 	WriteToRegister(FuncDay, buf, 1);
 
 }
-
-void RTC_DS3231::SetTime(uint16_t hours, uint16_t minutes, uint16_t seconds)
+//Set the time in 24h format
+void RTC_DS3231::SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds)
 {
 	byte buf[1];
 	buf[0] = hours > 24 ? hours % 24 : hours;
@@ -89,7 +97,24 @@ void RTC_DS3231::SetTime(uint16_t hours, uint16_t minutes, uint16_t seconds)
 	buf[0] = seconds > 59 ? seconds % 60 : seconds;
 	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
 	WriteToRegister(FuncSeconds, buf, 1);
+}
+//Set the time in 12h format
+void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds)
+{
+	byte buf[1];
+	buf[0] = hours > 12 ? hours % 12 : hours;
+	buf[0] = IntToBCD(buf[0], TypeOfValue::Hours12);
+	buf[0] |= 0x40; //set 12h format
+	buf[0] |= isPM ? 0x20 : 0x00;
+	WriteToRegister(FuncHours, buf, 1);
 
+	buf[0] = minutes > 59 ? minutes % 60 : minutes;
+	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncMinutes, buf, 1);
+
+	buf[0] = seconds > 59 ? seconds % 60 : seconds;
+	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncSeconds, buf, 1);
 }
 
 int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
@@ -110,7 +135,7 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		// bit 1 :   => seconds * 1
 		// bit 0 :  /
 		val = ((value & 0x70) >> 4) * 10;
-		val += (value & 0x0F);
+		val |= (value & 0x0F);
 		break;
 #pragma endregion
 #pragma region Hours
@@ -134,8 +159,8 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		{
 			val = (value & 0x20) == 0x20 ? 20 : 0;
 		}
-		val += (value & 0x10) == 0x10 ? 10 : 0;
-		val += (value & 0x0F);
+		val |= (value & 0x10) == 0x10 ? 10 : 0;
+		val |= (value & 0x0F);
 		break;
 #pragma endregion
 #pragma region Year
@@ -151,7 +176,7 @@ int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 		// bit 1 :   => year * 1
 		// bit 0 :  /
 		val = ((value & 0xF0) >> 4) * 10;
-		val += (value & 0x0F);
+		val |= (value & 0x0F);
 		break;
 #pragma endregion
 	}
@@ -166,18 +191,17 @@ uint16_t RTC_DS3231::IntToBCD(byte value, TypeOfValue tov)
 	{
 	case TypeOfValue::SecOrMinOrMonthOrDate:
 		val = (value / 10) << 4;
-		val += value % 10;
+		val |= value % 10;
 		val &= 0x7F;
 		break;
 	case TypeOfValue::Hours24:
-		val += (value / 20 >= 1) ? 0x20 :( value / 10 >= 1 ? 0x10 : 0x00);
-		val += (value % 10);
+		val = (value / 20 >= 1) ? 0x20 :( value / 10 >= 1 ? 0x10 : 0x00);
+		val |= (value % 10);
 		break;
 	case TypeOfValue::Hours12:
-		break;
 	case TypeOfValue::Year:
 		val = (value / 10) << 4;
-		val += value % 10;
+		val |= value % 10;
 		break;
 	}
 	return val;
