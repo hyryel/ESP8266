@@ -19,13 +19,13 @@ class I2CBase
 		void WriteToRegister(byte reg, byte* values, size_t valLength);
 		void WriteToRegister(byte reg, byte value);
 		int ReadFromRegister(byte reg, byte* readBuffer, size_t buffLength);
-
+		virtual void CustomSetup() {};
 	private:
 		byte _address;
 		byte _clockRate;
 		uint8_t _sda, _scl;
 		bool _initialized = false;
-		const int DefaultClockRate = 400;
+		void SetClockRate();
 };
 
 
