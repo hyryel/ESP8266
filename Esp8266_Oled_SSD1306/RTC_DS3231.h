@@ -42,6 +42,16 @@ enum class TypeOfValue
 	Hours12,
 	Year
 };
+enum class DayOfWeek
+{
+	Monday = 1,
+	Tuesday,
+	Wednesday,
+	Thursday,
+	Friday,
+	Saturday,
+	Sunday
+};
 #define RTC_DEFAULT_ADDRESS 0x68
 class RTC_DS3231 : public I2CBase
 {
@@ -55,6 +65,7 @@ public:
 	void SetDate(uint16_t year, uint16_t month, uint16_t day);
 	void SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds);
 	void SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds);
+	void SetDay(DayOfWeek day);
 protected:
 
 private:

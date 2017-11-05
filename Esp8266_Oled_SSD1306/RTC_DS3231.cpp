@@ -116,6 +116,11 @@ void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t
 	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
 	WriteToRegister(FuncSeconds, buf, 1);
 }
+//Set the day of week.
+void RTC_DS3231::SetDay(DayOfWeek day)
+{
+	WriteToRegister(FuncDay, (byte)day);
+}
 
 int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)
 {
