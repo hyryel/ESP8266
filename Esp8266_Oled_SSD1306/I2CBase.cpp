@@ -11,6 +11,7 @@ void I2CBase::WriteToRegister(byte reg, byte * values, size_t valLength)
 {
 	if (_initialized)
 	{
+		SetClockRate();
 		//advertise the slave device that we will send something
 		Wire.beginTransmission(_address);
 		//select the register to write to
@@ -82,6 +83,7 @@ void I2CBase::SetClockRate()
 {
 	if (_initialized)
 	{
+		//Initialize clock rate for I²C
 		Wire.setClock(_clockRate*1000);
 	}
 }
@@ -103,8 +105,6 @@ void I2CBase::Setup(uint8_t SDA, uint8_t SCL)
 	_scl = SCL;
 	_sda = SDA;
 	Wire.begin(_sda, _scl);
-	//Initialize clock rate for I²C
-	Wire.setClock(_clockRate*1000);
 	//Configure custom setup (this method is custom implemented)
 	CustomSetup();
 	//setup is done
