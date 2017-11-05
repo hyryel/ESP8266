@@ -3,11 +3,11 @@
 // 
 
 #include "RTC_DS3231.h"
-//Create the rtc object with default address 0x68
-RTC_DS3231::RTC_DS3231() : I2CBase(RTC_DEFAULT_ADDRESS)
+//Create the RTC object with default address 0x68 and default clock rate (400 Khz)
+RTC_DS3231::RTC_DS3231() : RTC_DS3231(RTC_DEFAULT_ADDRESS)
 {
 }
-RTC_DS3231::RTC_DS3231(byte address) : I2CBase(address)
+RTC_DS3231::RTC_DS3231(byte address) : RTC_DS3231(address, 400)
 {
 }
 RTC_DS3231::RTC_DS3231(byte address, uint16_t clockRateKhz) : I2CBase(address, clockRateKhz)
@@ -69,7 +69,7 @@ DateTime RTC_DS3231::GetDateTime()
 void RTC_DS3231::SetDate(uint16_t year, uint16_t month, uint16_t day)
 {
 	byte buf[1];
-	buf[0] = year > 99 ? 99: year;
+	buf[0] = year > 99 ? 99 : year;
 	buf[0] = IntToBCD(buf[0], TypeOfValue::Year);
 	WriteToRegister(FuncYear, buf, 1);
 
@@ -200,7 +200,7 @@ uint16_t RTC_DS3231::IntToBCD(byte value, TypeOfValue tov)
 		val &= 0x7F;
 		break;
 	case TypeOfValue::Hours24:
-		val = (value / 20 >= 1) ? 0x20 :( value / 10 >= 1 ? 0x10 : 0x00);
+		val = (value / 20 >= 1) ? 0x20 : (value / 10 >= 1 ? 0x10 : 0x00);
 		val |= (value % 10);
 		break;
 	case TypeOfValue::Hours12:
