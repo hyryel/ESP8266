@@ -64,58 +64,134 @@ DateTime RTC_DS3231::GetDateTime()
 //Set the date
 void RTC_DS3231::SetDate(uint16_t year, uint16_t month, uint16_t day)
 {
-	byte buf[1];
-	buf[0] = year > 99 ? 99 : year;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::Year);
-	WriteToRegister(FuncYear, buf, 1);
+	byte buf;
+	buf = year % 99;
+	buf = IntToBCD(buf, TypeOfValue::Year);
+	WriteToRegister(FuncYear, buf);
 
-	buf[0] = month > 12 ? month % 12 : month;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncMonth, buf, 1);
+	buf = month % 12;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncMonth, buf);
 
-	buf[0] = day > 31 ? day % 31 : day;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncDay, buf, 1);
+	buf = day % 31;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncDay, buf);
 
 }
 //Set the time in 24h format
 void RTC_DS3231::SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds)
 {
-	byte buf[1];
-	buf[0] = hours > 24 ? hours % 24 : hours;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::Hours24);
-	WriteToRegister(FuncHours, buf, 1);
+	byte buf;
+	buf = hours % 24;
+	buf = IntToBCD(buf, TypeOfValue::Hours24);
+	WriteToRegister(FuncHours, buf);
 
-	buf[0] = minutes > 59 ? minutes % 60 : minutes;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncMinutes, buf, 1);
+	buf = minutes % 60;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncMinutes, buf);
 
-	buf[0] = seconds > 59 ? seconds % 60 : seconds;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncSeconds, buf, 1);
+	buf = seconds % 60;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncSeconds, buf);
 }
 //Set the time in 12h format
 void RTC_DS3231::SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds)
 {
-	byte buf[1];
-	buf[0] = hours > 12 ? hours % 12 : hours;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::Hours12);
-	buf[0] |= 0x40; //set 12h format
-	buf[0] |= isPM ? 0x20 : 0x00;
-	WriteToRegister(FuncHours, buf, 1);
+	byte buf;
+	buf = hours % 12;
+	buf = IntToBCD(buf, TypeOfValue::Hours12);
+	buf |= 0x40; //set 12h format
+	buf |= isPM ? 0x20 : 0x00;
+	WriteToRegister(FuncHours, buf);
 
-	buf[0] = minutes > 59 ? minutes % 60 : minutes;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncMinutes, buf, 1);
+	buf = minutes % 60;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncMinutes, buf);
 
-	buf[0] = seconds > 59 ? seconds % 60 : seconds;
-	buf[0] = IntToBCD(buf[0], TypeOfValue::SecOrMinOrMonthOrDate);
-	WriteToRegister(FuncSeconds, buf, 1);
+	buf = seconds % 60;
+	buf = IntToBCD(buf, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(FuncSeconds, buf);
 }
 //Set the day of week.
 void RTC_DS3231::SetDay(DayOfWeek day)
 {
 	WriteToRegister(FuncDay, (byte)day);
+}
+//Set the day/date of the alarm
+//al : Alarm1 or Alarm2
+//byDay : if true, day should be a value of DayOfWeek
+//day : the day/date. Value is modulo 7 if byDay = true, else Modulo 31
+void RTC_DS3231::SetAlarmDate(Alarm al, bool byDay, uint16_t day)
+{
+	byte adr;
+	switch (al)
+	{
+	case Alarm::Alarm1:
+		adr = FuncAlarm1Day;
+		break;
+	case Alarm::Alarm2:
+		adr = FuncAlarm2Day;
+		break;
+	}
+	byte value = byDay ? 0x40 : 0x00; 
+	value |= IntToBCD(byDay ? day % 7 : day % 31, TypeOfValue::SecOrMinOrMonthOrDate);
+
+	WriteToRegister(adr, value);
+
+}
+//Set the time for the alarm in 24h format
+//al : Alarm1 or Alarm2
+//hour : hour in 24h format. the value is modulo 24
+//minute : the value is modulo 60
+//second : the value is modulo 60
+void RTC_DS3231::SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16_t second)
+{
+	byte adr;
+	//set hour
+	adr = al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours;
+	uint16_t val = IntToBCD(hour % 24, TypeOfValue::Hours24);
+	WriteToRegister(adr, val);
+	//set minutes
+	adr = al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes;
+	val = IntToBCD(minute%60, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(adr, val);
+	if (al == Alarm::Alarm1)
+	{
+		//set second
+		adr = FuncAlarm1Seconds;
+		val = IntToBCD(second%60, TypeOfValue::SecOrMinOrMonthOrDate);
+		WriteToRegister(adr, val);
+	}
+}
+//Set the time for the alarm in 12h format
+//al : Alarm1 or Alarm2
+//hour : hour in 12h format. the value is modulo 12
+//minute : the value is modulo 60
+//second : the value is modulo 60
+void RTC_DS3231::SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t minute, uint16_t second)
+{
+	byte adr;
+	//set hour
+	adr = al == Alarm::Alarm1 ? FuncAlarm1Hours : FuncAlarm2Hours;
+	uint16_t val = IntToBCD(hour % 12, TypeOfValue::Hours12);
+	WriteToRegister(adr, val);
+	//set minutes
+	adr = al == Alarm::Alarm1 ? FuncAlarm1Minutes : FuncAlarm2Minutes;
+	val = IntToBCD(minute % 60, TypeOfValue::SecOrMinOrMonthOrDate);
+	WriteToRegister(adr, val);
+	if (al == Alarm::Alarm1)
+	{
+		//set second
+		adr = FuncAlarm1Seconds;
+		val = IntToBCD(second % 60, TypeOfValue::SecOrMinOrMonthOrDate);
+		WriteToRegister(adr, val);
+	}
+}
+
+
+void RTC_DS3231::CustomSetup()
+{
+	return I2CBase::CustomSetup();
 }
 
 int16_t RTC_DS3231::BCDToInt(byte value, TypeOfValue tov)

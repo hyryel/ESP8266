@@ -10,6 +10,22 @@
 #endif
 
 #define RTC_DEFAULT_ADDRESS 0x68
+
+enum class Alarm
+{
+	Alarm1 = 1,
+	Alarm2 = 2
+};
+
+enum class AlarmMode
+{
+	OncePerSecond,
+	WhenSecondsMatch,
+	WhenMinutesSecondsMatch,
+	WhenHoursMinutesSecondsMatch,
+	WhenDateHoursMinutesSecondsMatch
+};
+
 class RTC_DS3231 : public I2CBase
 {
 public:
@@ -20,10 +36,15 @@ public:
 	Date GetDate();
 	DateTime GetDateTime();
 	void SetDate(uint16_t year, uint16_t month, uint16_t day);
-	void SetTime24(uint16_t hours, uint16_t minutes, uint16_t seconds);
+	void SetTime24(uint16_t hours, uint16_t minute, uint16_t seconds);
 	void SetTime12(bool isPM, uint16_t hours, uint16_t minutes, uint16_t seconds);
 	void SetDay(DayOfWeek day);
+	void SetAlarmDate(Alarm al, bool byDay, uint16_t day);
+	void SetAlarmTime24(Alarm al, uint16_t hour, uint16_t minute, uint16_t second);
+	void SetAlarmTime12(Alarm al, bool isPM, uint16_t hour, uint16_t minutes, uint16_t second);
+
 protected:
+	void CustomSetup() override;
 
 private:
 	int16_t BCDToInt(byte value, TypeOfValue tov);
